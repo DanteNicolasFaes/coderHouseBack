@@ -1,3 +1,5 @@
+// rutas/productos.js
+
 import express from 'express';
 import fs from 'fs/promises';
 import { obtenerSiguienteIdProducto } from '../utilidades/contadorIds.js';
@@ -7,23 +9,26 @@ const rutaProductos = './data/productos.json';
 
 const leerProductos = async () => {
   try {
-    if (!(await fs.stat(rutaProductos)).isFile()) {
-      await fs.writeFile(rutaProductos, JSON.stringify([]));
-    }
     const datosProductos = await fs.readFile(rutaProductos);
     return JSON.parse(datosProductos);
   } catch (error) {
-    console.error('Error al leer el archivo de productos:', error);
-    return [];
+    if (error.code === 'ENOENT') {
+      // Si el archivo no existe, se crea vacío
+      await fs.writeFile(rutaProductos, JSON.stringify([]));
+      return [];
+    }
+    throw error;
   }
 };
 
 const escribirProductos = async (productos) => {
-  try {
-    await fs.writeFile(rutaProductos, JSON.stringify(productos, null, 2));
-  } catch (error) {
-    console.error('Error al escribir en el archivo de productos:', error);
-  }
+  await fs.writeFile(rutaProductos, JSON.stringify(productos, null, 2));
+};
+
+// Función para obtener un producto por su ID
+export const obtenerProductoPorId = async (id) => {
+  const productos = await leerProductos();
+  return productos.find(p => p.id === parseInt(id));
 };
 
 // GET /api/products - Listar todos los productos
@@ -32,6 +37,7 @@ router.get('/', async (req, res) => {
     const productos = await leerProductos();
     res.json(productos);
   } catch (error) {
+    console.error('Error al obtener todos los productos:', error);
     res.status(500).send('Error interno del servidor');
   }
 });
@@ -39,14 +45,14 @@ router.get('/', async (req, res) => {
 // GET /api/products/:pid - Obtener un producto por ID
 router.get('/:pid', async (req, res) => {
   try {
-    const productos = await leerProductos();
-    const producto = productos.find(p => p.id === parseInt(req.params.pid));
+    const producto = await obtenerProductoPorId(req.params.pid);
     if (producto) {
       res.json(producto);
     } else {
       res.status(404).send('Producto no encontrado');
     }
   } catch (error) {
+    console.error('Error al obtener el producto por ID:', error);
     res.status(500).send('Error interno del servidor');
   }
 });
@@ -93,7 +99,8 @@ router.put('/:pid', async (req, res) => {
 
     const productoActualizado = {
       ...productos[indiceProducto],
-      ...req.body
+      ...req.body,
+      id: parseInt(req.params.pid) // Asegurar que el ID no cambie
     };
 
     productos[indiceProducto] = productoActualizado;
