@@ -1,0 +1,16 @@
+[
+  {
+    "id": 5,
+    "title": "Producto Actualizad0",
+    "description": "Descripción actualizada",
+    "code": "PROD002",
+    "price": 49.99,
+    "status": true,
+    "stock": 50,
+    "category": "Electrónicos",
+    "thumbnails": [
+      "https://ejemplo.com/thumbnail1.jpg",
+      "https://ejemplo.com/thumbnail2.jpg"
+    ]
+  }
+]
