@@ -1,5 +1,3 @@
-// utilidades/contadorIds.js
-
 import fs from 'fs';
 
 const ruta = './data/contadorIds.json';
