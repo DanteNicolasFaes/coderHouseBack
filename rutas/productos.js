@@ -1,4 +1,4 @@
-// rutas/productos.js
+
 
 import express from 'express';
 import fs from 'fs/promises';
@@ -13,7 +13,6 @@ const leerProductos = async () => {
     return JSON.parse(datosProductos);
   } catch (error) {
     if (error.code === 'ENOENT') {
-      // Si el archivo no existe, se crea vacío
       await fs.writeFile(rutaProductos, JSON.stringify([]));
       return [];
     }
@@ -25,13 +24,13 @@ const escribirProductos = async (productos) => {
   await fs.writeFile(rutaProductos, JSON.stringify(productos, null, 2));
 };
 
-// Función para obtener un producto por su ID
+
 export const obtenerProductoPorId = async (id) => {
   const productos = await leerProductos();
   return productos.find(p => p.id === parseInt(id));
 };
 
-// GET /api/products - Listar todos los productos
+
 router.get('/', async (req, res) => {
   try {
     const productos = await leerProductos();
@@ -42,7 +41,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/products/:pid - Obtener un producto por ID
+
 router.get('/:pid', async (req, res) => {
   try {
     const producto = await obtenerProductoPorId(req.params.pid);
@@ -57,7 +56,7 @@ router.get('/:pid', async (req, res) => {
   }
 });
 
-// POST /api/products - Agregar un nuevo producto
+
 router.post('/', async (req, res) => {
   try {
     const { title, description, code, price, stock, category, thumbnails = [] } = req.body;
@@ -87,7 +86,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/products/:pid - Actualizar un producto por ID
+
 router.put('/:pid', async (req, res) => {
   try {
     const productos = await leerProductos();
@@ -100,7 +99,7 @@ router.put('/:pid', async (req, res) => {
     const productoActualizado = {
       ...productos[indiceProducto],
       ...req.body,
-      id: parseInt(req.params.pid) // Asegurar que el ID no cambie
+      id: parseInt(req.params.pid) 
     };
 
     productos[indiceProducto] = productoActualizado;
@@ -112,7 +111,7 @@ router.put('/:pid', async (req, res) => {
   }
 });
 
-// PATCH /api/products/:pid - Actualizar parcialmente un producto por ID
+
 router.patch('/:pid', async (req, res) => {
   try {
     const productos = await leerProductos();
@@ -122,9 +121,9 @@ router.patch('/:pid', async (req, res) => {
       return res.status(404).send('Producto no encontrado');
     }
 
-    // Actualizar solo las propiedades especificadas en el body
+   
     for (let campo in req.body) {
-      if (campo !== 'id') { // No permitir la actualización del ID
+      if (campo !== 'id') { 
         productos[indiceProducto][campo] = req.body[campo];
       }
     }
@@ -137,7 +136,7 @@ router.patch('/:pid', async (req, res) => {
   }
 });
 
-// DELETE /api/products/:pid - Eliminar un producto por ID
+
 router.delete('/:pid', async (req, res) => {
   try {
     const productos = await leerProductos();
