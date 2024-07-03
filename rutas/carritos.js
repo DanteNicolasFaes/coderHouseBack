@@ -36,10 +36,6 @@ const leerProductos = async () => {
   }
 };
 
-const escribirProductos = async (productos) => {
-  await fs.writeFile(rutaProductos, JSON.stringify(productos, null, 2));
-};
-
 
 router.post('/', async (req, res) => {
   try {
