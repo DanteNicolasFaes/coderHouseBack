@@ -1,7 +1,6 @@
 import express from 'express';
 import productosRouter from './rutas/productos.js';
 import carritosRouter from './rutas/carritos.js';
-import { __dirname } from './utilidades/utils.js';
 import { engine } from 'express-handlebars';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -15,7 +14,6 @@ const app = express();
 const puerto = 8080;
 const server = http.createServer(app);
 const io = new Server(server);
-
 
 app.use(express.json());
 
@@ -33,7 +31,9 @@ io.on('connection', (socket) => {
   console.log('Nuevo cliente conectado');
 });
 
-app.listen(puerto), () => {
-  console.log(`Servidor escuchando en el puerto ${puerto}`)};
+server.listen(puerto, () => {
+  console.log(`Servidor escuchando en el puerto ${puerto}`);
+});
 
 export default io;
+
