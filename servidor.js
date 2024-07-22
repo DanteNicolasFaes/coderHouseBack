@@ -1,14 +1,13 @@
 import express from 'express';
-import bodyParser from 'body-parser'; 
 import productosRouter from './rutas/productos.js';
 import carritosRouter from './rutas/carritos.js';
+import { __dirname } from './utilidades/utils.js';
 
 const app = express();
 const puerto = 8080;
 
-
-app.use(bodyParser.json());
-
+// Usamos express.json() en lugar de bodyParser.json()
+app.use(express.json());
 
 app.use('/api/products', productosRouter);
 app.use('/api/carts', carritosRouter);

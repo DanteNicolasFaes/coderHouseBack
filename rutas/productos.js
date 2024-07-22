@@ -1,5 +1,5 @@
 
-
+/*
 import express from 'express';
 import fs from 'fs/promises';
 import { obtenerSiguienteIdProducto } from '../utilidades/contadorIds.js';
@@ -147,6 +147,113 @@ router.delete('/:pid', async (req, res) => {
     }
 
     await escribirProductos(nuevosProductos);
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error al eliminar el producto:', error);
+    res.status(500).send('Error interno del servidor');
+  }
+});
+
+export default router;
+*/
+import express from 'express';
+import ProductManager from '../manager/ProductsManager.js';
+import { obtenerSiguienteIdProducto } from '../utilidades/contadorIds.js';
+
+const router = express.Router();
+const productManager = new ProductManager('data/productos.json');
+
+router.get('/', async (req, res) => {
+  try {
+    const productos = await productManager.getProducts();
+    res.json(productos);
+  } catch (error) {
+    console.error('Error al obtener todos los productos:', error);
+    res.status(500).send('Error interno del servidor');
+  }
+});
+
+router.get('/:pid', async (req, res) => {
+  try {
+    const producto = await productManager.getProductById(parseInt(req.params.pid));
+    if (producto) {
+      res.json(producto);
+    } else {
+      res.status(404).send('Producto no encontrado');
+    }
+  } catch (error) {
+    console.error('Error al obtener el producto por ID:', error);
+    res.status(500).send('Error interno del servidor');
+  }
+});
+
+router.post('/', async (req, res) => {
+  try {
+    const { title, description, code, price, stock, category, thumbnails = [] } = req.body;
+    if (!title || !description || !code || !price || !stock || !category) {
+      return res.status(400).send('Todos los campos son obligatorios, excepto thumbnails');
+    }
+
+    const nuevoProducto = {
+      id: obtenerSiguienteIdProducto(),
+      title,
+      description,
+      code,
+      price,
+      status: true,
+      stock,
+      category,
+      thumbnails
+    };
+
+    await productManager.addProduct(nuevoProducto);
+    res.status(201).json(nuevoProducto);
+  } catch (error) {
+    console.error('Error al agregar un nuevo producto:', error);
+    res.status(500).send('Error interno del servidor');
+  }
+});
+
+router.put('/:pid', async (req, res) => {
+  try {
+    const productoActualizado = {
+      ...req.body,
+      id: parseInt(req.params.pid)
+    };
+
+    await productManager.updateProduct(parseInt(req.params.pid), productoActualizado);
+    res.json(productoActualizado);
+  } catch (error) {
+    console.error('Error al actualizar el producto:', error);
+    res.status(500).send('Error interno del servidor');
+  }
+});
+
+router.patch('/:pid', async (req, res) => {
+  try {
+    const producto = await productManager.getProductById(parseInt(req.params.pid));
+
+    if (!producto) {
+      return res.status(404).send('Producto no encontrado');
+    }
+
+    for (let campo in req.body) {
+      if (campo !== 'id') {
+        producto[campo] = req.body[campo];
+      }
+    }
+
+    await productManager.updateProduct(parseInt(req.params.pid), producto);
+    res.json(producto);
+  } catch (error) {
+    console.error('Error al actualizar parcialmente el producto:', error);
+    res.status(500).send('Error interno del servidor');
+  }
+});
+
+router.delete('/:pid', async (req, res) => {
+  try {
+    await productManager.deleteProduct(parseInt(req.params.pid));
     res.status(204).send();
   } catch (error) {
     console.error('Error al eliminar el producto:', error);
