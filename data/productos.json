@@ -12,5 +12,19 @@
       "https://ejemplo.com/thumbnail1.jpg",
       "https://ejemplo.com/thumbnail2.jpg"
     ]
+  },
+  {
+    "id": 6,
+    "title": "Nuevo Producto",
+    "description": "Descripción del nuevo producto",
+    "code": "PROD003",
+    "price": 59.99,
+    "status": true,
+    "stock": 20,
+    "category": "Electrónicos",
+    "thumbnails": [
+      "https://ejemplo.com/thumbnail3.jpg",
+      "https://ejemplo.com/thumbnail4.jpg"
+    ]
   }
 ]

@@ -161,7 +161,7 @@ import ProductsManager from '../manager/ProductsManager.js';
 import { obtenerSiguienteIdProducto } from '../utilidades/contadorIds.js';
 
 const router = express.Router();
-const productsManager = new ProductsManager('data/productos.json');
+const productsManager = new ProductsManager('productos.json');
 
 router.get('/', async (req, res) => {
   try {

@@ -6,7 +6,8 @@ class CartManager {
   #ruta;
 
   constructor(ruta) {
-    this.#ruta = path.join(__dirname, ruta);
+    this.#ruta = path.join(__dirname, '..', 'data', ruta); // Actualiza la ruta para apuntar a 'data'
+    console.log(`Ruta de carritos: ${this.#ruta}`);
   }
 
   async obtenerCarritos() {
@@ -19,11 +20,19 @@ class CartManager {
     }
   }
 
+  async guardarCarritos(carritos) {
+    try {
+      await fs.writeFile(this.#ruta, JSON.stringify(carritos, null, 2));
+    } catch (error) {
+      console.error('Error guardando datos de carritos:', error);
+    }
+  }
+
   async agregarCarrito(carrito) {
     try {
       const carritos = await this.obtenerCarritos();
       carritos.push(carrito);
-      await fs.writeFile(this.#ruta, JSON.stringify(carritos, null, 2));
+      await this.guardarCarritos(carritos);
     } catch (error) {
       console.error('Error agregando carrito:', error);
     }
@@ -35,7 +44,7 @@ class CartManager {
       const indice = carritos.findIndex(carrito => carrito.id === id);
       if (indice !== -1) {
         carritos[indice] = { ...carritos[indice], ...carritoActualizado };
-        await fs.writeFile(this.#ruta, JSON.stringify(carritos, null, 2));
+        await this.guardarCarritos(carritos);
       }
     } catch (error) {
       console.error('Error actualizando carrito:', error);
@@ -46,7 +55,7 @@ class CartManager {
     try {
       const carritos = await this.obtenerCarritos();
       const carritosActualizados = carritos.filter(carrito => carrito.id !== id);
-      await fs.writeFile(this.#ruta, JSON.stringify(carritosActualizados, null, 2));
+      await this.guardarCarritos(carritos);
     } catch (error) {
       console.error('Error eliminando carrito:', error);
     }
@@ -59,6 +68,30 @@ class CartManager {
     } catch (error) {
       console.error('Error obteniendo carrito por ID:', error);
       return null;
+    }
+  }
+
+  async agregarProductoAlCarrito(idCarrito, producto) {
+    try {
+      const carritos = await this.obtenerCarritos();
+      const carrito = carritos.find(c => c.id === idCarrito);
+
+      if (!carrito) {
+        console.error(`Carrito con ID ${idCarrito} no encontrado.`);
+        return;
+      }
+
+      const productoExistente = carrito.products.find(p => p.product === producto.product);
+
+      if (productoExistente) {
+        productoExistente.quantity += producto.quantity;
+      } else {
+        carrito.products.push(producto);
+      }
+
+      await this.guardarCarritos(carritos);
+    } catch (error) {
+      console.error('Error agregando producto al carrito:', error);
     }
   }
 }

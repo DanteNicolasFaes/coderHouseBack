@@ -6,7 +6,7 @@ class ProductsManager {
   #ruta;
 
   constructor(ruta) {
-    // Asegúrate de que la ruta apunte correctamente a la carpeta 'data'
+    // Construcción correcta de la ruta
     this.#ruta = path.join(__dirname, '..', 'data', ruta);
 
     console.log(`Ruta de productos: ${this.#ruta}`);
