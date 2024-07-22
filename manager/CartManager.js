@@ -1,60 +1,61 @@
 import fs from 'fs/promises';
+import path from 'path';
 import { __dirname } from '../utilidades/utils.js';
 
 class CartManager {
-  #path;
+  #ruta;
 
-  constructor(path) {
-    this.#path = `${__dirname}/${path}`;
+  constructor(ruta) {
+    this.#ruta = path.join(__dirname, ruta);
   }
 
-  async getCart() {
+  async obtenerCarritos() {
     try {
-      const data = await fs.readFile(this.#path, 'utf-8');
-      return JSON.parse(data);
+      const datos = await fs.readFile(this.#ruta, 'utf-8');
+      return JSON.parse(datos);
     } catch (error) {
       console.error('Error leyendo datos de carritos:', error);
       return [];
     }
   }
 
-  async addCart(cart) {
+  async agregarCarrito(carrito) {
     try {
-      const carts = await this.getCart();
-      carts.push(cart);
-      await fs.writeFile(this.#path, JSON.stringify(carts, null, 2));
+      const carritos = await this.obtenerCarritos();
+      carritos.push(carrito);
+      await fs.writeFile(this.#ruta, JSON.stringify(carritos, null, 2));
     } catch (error) {
       console.error('Error agregando carrito:', error);
     }
   }
 
-  async updateCart(id, updatedCart) {
+  async actualizarCarrito(id, carritoActualizado) {
     try {
-      const carts = await this.getCart();
-      const index = carts.findIndex(cart => cart.id === id);
-      if (index !== -1) {
-        carts[index] = { ...carts[index], ...updatedCart };
-        await fs.writeFile(this.#path, JSON.stringify(carts, null, 2));
+      const carritos = await this.obtenerCarritos();
+      const indice = carritos.findIndex(carrito => carrito.id === id);
+      if (indice !== -1) {
+        carritos[indice] = { ...carritos[indice], ...carritoActualizado };
+        await fs.writeFile(this.#ruta, JSON.stringify(carritos, null, 2));
       }
     } catch (error) {
       console.error('Error actualizando carrito:', error);
     }
   }
 
-  async deleteCart(id) {
+  async eliminarCarrito(id) {
     try {
-      const carts = await this.getCart();
-      const updatedCarts = carts.filter(cart => cart.id !== id);
-      await fs.writeFile(this.#path, JSON.stringify(updatedCarts, null, 2));
+      const carritos = await this.obtenerCarritos();
+      const carritosActualizados = carritos.filter(carrito => carrito.id !== id);
+      await fs.writeFile(this.#ruta, JSON.stringify(carritosActualizados, null, 2));
     } catch (error) {
       console.error('Error eliminando carrito:', error);
     }
   }
 
-  async getCartById(id) {
+  async obtenerCarritoPorId(id) {
     try {
-      const carts = await this.getCart();
-      return carts.find(cart => cart.id === id);
+      const carritos = await this.obtenerCarritos();
+      return carritos.find(carrito => carrito.id === id);
     } catch (error) {
       console.error('Error obteniendo carrito por ID:', error);
       return null;

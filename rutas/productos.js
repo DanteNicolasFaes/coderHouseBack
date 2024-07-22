@@ -157,15 +157,15 @@ router.delete('/:pid', async (req, res) => {
 export default router;
 */
 import express from 'express';
-import ProductManager from '../manager/ProductsManager.js';
+import ProductsManager from '../manager/ProductsManager.js';
 import { obtenerSiguienteIdProducto } from '../utilidades/contadorIds.js';
 
 const router = express.Router();
-const productManager = new ProductManager('data/productos.json');
+const productsManager = new ProductsManager('data/productos.json');
 
 router.get('/', async (req, res) => {
   try {
-    const productos = await productManager.getProducts();
+    const productos = await productsManager.obtenerProductos();
     res.json(productos);
   } catch (error) {
     console.error('Error al obtener todos los productos:', error);
@@ -175,7 +175,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:pid', async (req, res) => {
   try {
-    const producto = await productManager.getProductById(parseInt(req.params.pid));
+    const producto = await productsManager.obtenerProductoPorId(parseInt(req.params.pid));
     if (producto) {
       res.json(producto);
     } else {
@@ -206,7 +206,7 @@ router.post('/', async (req, res) => {
       thumbnails
     };
 
-    await productManager.addProduct(nuevoProducto);
+    await productsManager.agregarProducto(nuevoProducto);
     res.status(201).json(nuevoProducto);
   } catch (error) {
     console.error('Error al agregar un nuevo producto:', error);
@@ -221,7 +221,7 @@ router.put('/:pid', async (req, res) => {
       id: parseInt(req.params.pid)
     };
 
-    await productManager.updateProduct(parseInt(req.params.pid), productoActualizado);
+    await productsManager.actualizarProducto(parseInt(req.params.pid), productoActualizado);
     res.json(productoActualizado);
   } catch (error) {
     console.error('Error al actualizar el producto:', error);
@@ -231,7 +231,7 @@ router.put('/:pid', async (req, res) => {
 
 router.patch('/:pid', async (req, res) => {
   try {
-    const producto = await productManager.getProductById(parseInt(req.params.pid));
+    const producto = await productsManager.obtenerProductoPorId(parseInt(req.params.pid));
 
     if (!producto) {
       return res.status(404).send('Producto no encontrado');
@@ -243,7 +243,7 @@ router.patch('/:pid', async (req, res) => {
       }
     }
 
-    await productManager.updateProduct(parseInt(req.params.pid), producto);
+    await productsManager.actualizarProducto(parseInt(req.params.pid), producto);
     res.json(producto);
   } catch (error) {
     console.error('Error al actualizar parcialmente el producto:', error);
@@ -253,7 +253,7 @@ router.patch('/:pid', async (req, res) => {
 
 router.delete('/:pid', async (req, res) => {
   try {
-    await productManager.deleteProduct(parseInt(req.params.pid));
+    await productsManager.eliminarProducto(parseInt(req.params.pid));
     res.status(204).send();
   } catch (error) {
     console.error('Error al eliminar el producto:', error);

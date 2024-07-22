@@ -1,60 +1,63 @@
 import fs from 'fs/promises';
+import path from 'path';
 import { __dirname } from '../utilidades/utils.js';
 
-class ProductManager {
-  #path;
+class ProductsManager {
+  #ruta;
 
-  constructor(path) {
-    this.#path = `${__dirname}/${path}`;
+  constructor(ruta) {
+    // Asegúrate de que la ruta apunte correctamente a la carpeta 'data'
+    this.#ruta = path.join(__dirname, '..', 'data', ruta);
+    console.log(`Ruta de productos: ${this.#ruta}`);
   }
 
-  async getProducts() {
+  async obtenerProductos() {
     try {
-      const data = await fs.readFile(this.#path, 'utf-8');
-      return JSON.parse(data);
+      const datos = await fs.readFile(this.#ruta, 'utf-8');
+      return JSON.parse(datos);
     } catch (error) {
       console.error('Error leyendo datos de productos:', error);
       return [];
     }
   }
 
-  async addProduct(product) {
+  async agregarProducto(producto) {
     try {
-      const products = await this.getProducts();
-      products.push(product);
-      await fs.writeFile(this.#path, JSON.stringify(products, null, 2));
+      const productos = await this.obtenerProductos();
+      productos.push(producto);
+      await fs.writeFile(this.#ruta, JSON.stringify(productos, null, 2));
     } catch (error) {
       console.error('Error agregando producto:', error);
     }
   }
 
-  async updateProduct(id, updatedProduct) {
+  async actualizarProducto(id, productoActualizado) {
     try {
-      const products = await this.getProducts();
-      const index = products.findIndex(product => product.id === id);
-      if (index !== -1) {
-        products[index] = { ...products[index], ...updatedProduct };
-        await fs.writeFile(this.#path, JSON.stringify(products, null, 2));
+      const productos = await this.obtenerProductos();
+      const indice = productos.findIndex(producto => producto.id === id);
+      if (indice !== -1) {
+        productos[indice] = { ...productos[indice], ...productoActualizado };
+        await fs.writeFile(this.#ruta, JSON.stringify(productos, null, 2));
       }
     } catch (error) {
       console.error('Error actualizando producto:', error);
     }
   }
 
-  async deleteProduct(id) {
+  async eliminarProducto(id) {
     try {
-      const products = await this.getProducts();
-      const updatedProducts = products.filter(product => product.id !== id);
-      await fs.writeFile(this.#path, JSON.stringify(updatedProducts, null, 2));
+      const productos = await this.obtenerProductos();
+      const productosActualizados = productos.filter(producto => producto.id !== id);
+      await fs.writeFile(this.#ruta, JSON.stringify(productosActualizados, null, 2));
     } catch (error) {
       console.error('Error eliminando producto:', error);
     }
   }
 
-  async getProductById(id) {
+  async obtenerProductoPorId(id) {
     try {
-      const products = await this.getProducts();
-      return products.find(product => product.id === id);
+      const productos = await this.obtenerProductos();
+      return productos.find(producto => producto.id === id);
     } catch (error) {
       console.error('Error obteniendo producto por ID:', error);
       return null;
@@ -62,4 +65,4 @@ class ProductManager {
   }
 }
 
-export default ProductManager;
+export default ProductsManager;
