@@ -55,11 +55,12 @@ class CartManager {
     try {
       const carritos = await this.obtenerCarritos();
       const carritosActualizados = carritos.filter(carrito => carrito.id !== id);
-      await this.guardarCarritos(carritos);
+      await this.guardarCarritos(carritosActualizados); 
     } catch (error) {
       console.error('Error eliminando carrito:', error);
     }
   }
+  
 
   async obtenerCarritoPorId(id) {
     try {
@@ -73,27 +74,36 @@ class CartManager {
 
   async agregarProductoAlCarrito(idCarrito, producto) {
     try {
+      // Obtener todos los carritos
       const carritos = await this.obtenerCarritos();
+      
+      // Buscar el carrito específico
       const carrito = carritos.find(c => c.id === idCarrito);
-
+  
       if (!carrito) {
         console.error(`Carrito con ID ${idCarrito} no encontrado.`);
         return;
       }
-
+  
+      // Buscar el producto en el carrito
       const productoExistente = carrito.products.find(p => p.product === producto.product);
-
+  
       if (productoExistente) {
+        // Si el producto ya está en el carrito, actualizar la cantidad
         productoExistente.quantity += producto.quantity;
       } else {
+        // Si el producto no está en el carrito, agregarlo
         carrito.products.push(producto);
       }
-
+  
+      // Guardar los cambios en el archivo
       await this.guardarCarritos(carritos);
     } catch (error) {
       console.error('Error agregando producto al carrito:', error);
     }
   }
-}
+  
+  }
+
 
 export default CartManager;
