@@ -6,7 +6,7 @@ import io from '../servidor.js';
 const router = express.Router();
 const cartManager = new CartManager('carritos.json');
 
-// Ruta para obtener todos los carritos
+//get generl
 router.get('/', async (req, res) => {
   try {
     const carritos = await cartManager.obtenerCarritos();
@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Ruta para obtener un carrito por ID
+//  carrito por ID
 router.get('/:cid', async (req, res) => {
   try {
     const carrito = await cartManager.obtenerCarritoPorId(parseInt(req.params.cid));
@@ -32,29 +32,29 @@ router.get('/:cid', async (req, res) => {
   }
 });
 
-// Ruta para eliminar un producto del carrito
+// elimino producto del carrito
 router.delete('/:cid/product/:pid', async (req, res) => {
   try {
     const carritoId = parseInt(req.params.cid); // ID del carrito
     const productoId = parseInt(req.params.pid); // ID del producto
 
-    // Obtener todos los carritos
+    // todos los carritos
     const carritos = await cartManager.obtenerCarritos();
     
-    // Buscar el carrito específico
+    // busco un carrito en particilar
     const carrito = carritos.find(c => c.id === carritoId);
 
     if (!carrito) {
       return res.status(404).send('Carrito no encontrado');
     }
 
-    // Filtrar los productos para eliminar el producto especificado
+    // filtrado de productos para eliminar el producto especificado
     carrito.products = carrito.products.filter(p => p.product !== productoId);
     
-    // Guardar los cambios en el archivo
+    // guardo los cambios en el archivo
     await cartManager.guardarCarritos(carritos);
 
-    // Responder con el carrito actualizado
+    
     res.json(carrito);
   } catch (error) {
     console.error('Error al eliminar producto del carrito:', error);
@@ -62,7 +62,7 @@ router.delete('/:cid/product/:pid', async (req, res) => {
   }
 });
 
-// Ruta para crear un nuevo carrito
+// ruta para crear un nuevo carrito
 router.post('/', async (req, res) => {
   try {
     const nuevoCarrito = {
@@ -78,7 +78,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Ruta para actualizar un carrito por ID
+// ruta actualizar un carrito por ID
 router.put('/:cid', async (req, res) => {
   try {
     const carritoActualizado = {
@@ -94,7 +94,7 @@ router.put('/:cid', async (req, res) => {
   }
 });
 
-// Ruta para eliminar un carrito por ID
+// ruta eliminar un carrito por ID
 router.delete('/:cid', async (req, res) => {
   try {
     await cartManager.eliminarCarrito(parseInt(req.params.cid));
@@ -105,32 +105,32 @@ router.delete('/:cid', async (req, res) => {
   }
 });
 
-// Ruta para agregar un producto al carrito
+// ruta para agregar un producto al carrito
 router.post('/:cid/product/:pid', async (req, res) => {
   try {
     const carritoId = parseInt(req.params.cid); // ID del carrito
     const productoId = parseInt(req.params.pid); // ID del producto
     const { quantity } = req.body; // Cantidad del producto
 
-    // Verificar si la cantidad es válida
+    
     if (!quantity || quantity <= 0) {
       return res.status(400).json({ error: 'La cantidad debe ser un número positivo.' });
     }
 
-    // Crear un objeto producto con solo el ID y la cantidad
+    
     const producto = { product: productoId, quantity };
 
-    // Agregar el producto al carrito
+    
     await cartManager.agregarProductoAlCarrito(carritoId, producto);
 
-    // Obtener el carrito actualizado
+    
     const carritoActualizado = await cartManager.obtenerCarritoPorId(carritoId);
 
     if (carritoActualizado) {
-      // Responder con el carrito actualizado
+      
       res.json(carritoActualizado);
     } else {
-      // Si no se encuentra el carrito, responder con un error 404
+      
       res.status(404).send('Carrito no encontrado');
     }
   } catch (error) {
@@ -142,7 +142,7 @@ router.post('/:cid/product/:pid', async (req, res) => {
 
 
 
-// Ruta para agregar un producto al carrito
+
 router.post('/:cid/product/:pid', async (req, res) => {
   try {
     const carritoId = parseInt(req.params.cid);
@@ -157,7 +157,7 @@ router.post('/:cid/product/:pid', async (req, res) => {
     await cartManager.agregarProductoAlCarrito(carritoId, producto);
 
     const carritoActualizado = await cartManager.obtenerCarritoPorId(carritoId);
-    io.emit('updateCarts', carritoActualizado); // Emite el carrito actualizado
+    io.emit('updateCarts', carritoActualizado); 
     res.json(carritoActualizado);
   } catch (error) {
     console.error('Error al agregar producto al carrito:', error);
@@ -165,7 +165,7 @@ router.post('/:cid/product/:pid', async (req, res) => {
   }
 });
 
-// Ruta para eliminar un producto del carrito
+
 router.delete('/:cid/product/:pid', async (req, res) => {
   try {
     const carritoId = parseInt(req.params.cid);

@@ -6,7 +6,7 @@ class CartManager {
   #ruta;
 
   constructor(ruta) {
-    this.#ruta = path.join(__dirname, '..', 'data', ruta); // Actualiza la ruta para apuntar a 'data'
+    this.#ruta = path.join(__dirname, '..', 'data', ruta); 
     console.log(`Ruta de carritos: ${this.#ruta}`);
   }
 
@@ -74,10 +74,10 @@ class CartManager {
 
   async agregarProductoAlCarrito(idCarrito, producto) {
     try {
-      // Obtener todos los carritos
+     //conseguir todos los carritos
       const carritos = await this.obtenerCarritos();
       
-      // Buscar el carrito específico
+      // busco un carrito en particular
       const carrito = carritos.find(c => c.id === idCarrito);
   
       if (!carrito) {
@@ -85,18 +85,18 @@ class CartManager {
         return;
       }
   
-      // Buscar el producto en el carrito
+      
       const productoExistente = carrito.products.find(p => p.product === producto.product);
   
       if (productoExistente) {
-        // Si el producto ya está en el carrito, actualizar la cantidad
+       
         productoExistente.quantity += producto.quantity;
       } else {
-        // Si el producto no está en el carrito, agregarlo
+       
         carrito.products.push(producto);
       }
   
-      // Guardar los cambios en el archivo
+     
       await this.guardarCarritos(carritos);
     } catch (error) {
       console.error('Error agregando producto al carrito:', error);
